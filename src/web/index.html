@@ -1,0 +1,44 @@
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+
+<div style="margin: auto; width: 80%; height: 90%; display: flex; flex-direction: column; align-items: flex-start;">
+    <textarea id="inputTextArea" autofocus="true"
+        style="white-space: nowrap; height: 100%; margin: auto; width: 100%;"></textarea>
+    <button style="align-self: flex-end;" onclick="addItemsToWarehouse()">Send</button>
+    <textarea id="summary" disabled="true"
+        style="white-space: nowrap;margin: auto; height: 100%; width: 100%;"></textarea>
+</div>
+
+
+
+<script>
+
+    addItemsToWarehouse = function () {
+        let inputString = $("#inputTextArea").val();
+        $.post(`${window.location.origin}/warehouse`, { input: inputString }, () => {
+            loadWarehouses();
+        })
+    }
+
+    loadWarehouses = function () {
+        $.get(`${window.location.origin}/warehouse`, (data) => {
+            let result = "";
+            Array.from(data).forEach(warehouse => {
+                console.log(result)
+                result = result.concat(`${warehouse.name} (total ${warehouse.totalQuantity})\n`)
+                warehouse.materials.forEach(material => {
+                    result = result.concat(`${material.materialId}: ${material.quantity}\n`);
+                })
+                result = result.concat("\n")
+            });
+            $("#summary").text(result);
+        })
+    }
+
+    $(document).ready(() => {
+        loadWarehouses();
+    })
+
+</script>
